@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tienda Online</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    #search-button {
+      anchor-name: --search-button;
+    }
+
+    #search-input {
+      inset: unset;
+      top: anchor(--search-button top);
+      left: anchor(--search-button left);
+      translate: -100%;
+    }
+
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <!-- Header -->
+<header class="bg-neutral-900 text-white">
+  <div class="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+    <!-- Contenedor de los botones de filtro y notificación alineados a la izquierda -->
+    <div class="flex space-x-6">
+      <!-- Botón de filtro -->
+      <button id="filter-btn" class="rounded p-2 hover:bg-neutral-800 transition duration-200">
+        <i class="fa-solid fa-bars text-white"></i>
+      </button>
+      
+      <!-- Botón de notificación -->
+      <button id="Clock-btn" class="px-4 py-2 rounded hover:bg-neutral-800 transition duration-200">
+        <i class="fa-regular fa-clock fa-xl"></i>
+      </button>
+    </div>
+    
+    <!-- Título del sitio -->
+    <h1 class="text-2xl font-bold text-center flex-1">New Technology</h1>
+
+    <!-- Contenedor de los botones de búsqueda y carrito de compras alineados a la derecha -->
+    <div class="flex items-center space-x-6">
+      <!-- Botón de buscador -->
+      <div id="search-bar-container" class="flex mt-4 gap-2 mb-2">
+        <input id="search-input"type="text"style="color:black"placeholder="Buscar productos..."class="flex-1 p-2 border border-gray-300 rounded" popover anchor="search-button"/>
+        <button id="search-button" class=" px-4 py-2 rounded text-white" onclick="searchProducts()" popovertarget="search-input">
+          <i class="fa-solid fa-magnifying-glass"></i>
+        </button>
+      </div>
+
+      <!-- Botón de carrito de compras -->
+      <button id="cart-btn" class="mt-4 px-4 py-2 rounded text-white relative hover:bg-neutral-800 transition duration-200" onclick="toggleCart()">
+        <i class="fa-solid fa-cart-shopping"></i>
+        <span id="cart-count" class="absolute top-0 right-0 bg-sky-600 text-xs text-white rounded-lg px-2">0</span>
+      </button>
+    </div>
+  </div>
+</header>
+
+  <!-- Hero Section -->
+  <section class="bg-cover bg-center bg-gray-100 h-96 flex items-center justify-center text-white"
+    style="background-image: url('https://cdn.motowatch.com/skin/frontend/ebnmage/motowatch/images/category/slider/moto100.jpg');">
+    <div class="text-center">
+      <h2 class="text-3xl font-bold">Bienvenido al Futuro</h2>
+      <p class="mt-2">El futuro está en tu muñeca</p>
+    </div>
+  </section>
+
+  <!-- Popover de filtros -->
+  <div id="filter-popover" class="absolute bg-slate-950 shadow rounded-lg p-4 hidden mt-2 w-48">
+    <h3 class="text-sm font-bold text-gray-50 mb-2">Filtrar</h3>
+    <div class="mb-4">
+      <h4 class="font-bold text-gray-700">Categorías</h4>
+      <ul id="category-list" class="space-y-2">
+        <!-- Las categorías serán generadas dinámicamente aquí -->
+      </ul>
+    </div>
+    <div class="mb-4">
+      <h4 class="font-bold text-gray-50">Rango de Precio</h4>
+      <input type="range" id="price-filter" min="0" max="2000" step="50" value="2000" class="w-full mt-2 ">
+      <p class="text-sm text-gray-600">Hasta: $<span id="price-value">2000</span></p>
+    </div>
+    <button id="apply-filters" class="w-full bg-blue-600 text-white py-2 rounded">Aplicar Filtros</button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="from-slate-950 to-sky-500 px-4 py-8 bg-gradient-to-r bg-slate-50 ">
+    <div id="product-container" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+    <div id="product-detail" class="hidden bg-gradient-to-r bg-black bg-opacity-50  p-6 rounded-lg shadow">
+      <button id="back-to-catalog" class="text-slate-900 font-bold items-center underline mb-4 ">CATÁGOLO</button>
+      <div class="flex flex-col md:flex-row gap-6">
+        <img id="detail-image" src="" alt="" class="w-full md:w-1/3 rounded-lg">
+        <div class="bg-white p-6 rounded-lg shadow-lg space-y-4">
+          <!-- Título del producto -->
+          <h2 id="detail-title" class="text-2xl font-extrabold text-gray-800 mb-2"></h2>
+        
+          <!-- Descripción del producto -->
+          <p id="detail-description" class="text-gray-600 leading-relaxed mb-4"></p>
+        
+          <!-- Precio del producto -->
+          <p id="detail-price" class="text-2xl font-bold text-cyan-400 mb-4"></p>
+        
+          <!-- Características del producto -->
+          <ul id="detail-features" class="list-disc list-inside space-y-2 text-gray-700">
+            <!-- Las características se generarán dinámicamente aquí -->
+          </ul>
+        
+          <!-- Botón de agregar al carrito -->
+          <button 
+            id="addToCart" 
+            class="mt-6 w-full py-3 bg-gradient-to-r from-sky-700 to-sky-500 text-white font-semibold rounded-lg shadow-md hover:shadow-lg hover:from-sky-800 hover:to-sky-600 transition duration-300"
+            onclick="addToCart()"
+          >
+            Agregar al carrito
+          </button>
+        </div>
+        
+      </div>
+    </div>
+  </main>
+
+  <!-- Carrito -->
+  <div id="cart-container" class="fixed top-0 right-0 bg-white shadow-lg w-80 h-full hidden p-4 z-50">
+    <button id="close-cart" class="bg-blue-950 text-white px-4 py-2 rounded mb-4" onclick="toggleCart()">Cerrar Carrito</button>
+    <h2 class="text-2xl font-bold mb-4">Carrito de Compras</h2>
+    <ul id="cart-items" class="space-y-4 mb-4"></ul>
+    <div class="flex justify-between">
+      <span class="font-bold">Total:</span>
+      <span id="total-price" class="font-bold">$0.00</span>
+    </div>
+    <button id="checkout-btn" class="mt-4 bg-sky-900 text-white py-2 px-4 rounded w-full" onclick="procederCompra()">Proceder a la compra</button>
+  </div>
+
+  <!-- Template -->
+  <template id="product-card-template">
+    <div class="bg-white p-4 rounded-lg shadow hover:shadow-lg flex flex-col">
+      <img src="" alt="" class="rounded-t-lg">
+      <div class="mt-4 flex-1">
+        <h3 class="font-bold text-lg"></h3>
+        <p class="text-sm text-gray-500"></p>
+        <div class="flex items-center mt-2">
+          <span class="text-yellow-500">★</span>
+          <span class="ml-1"></span>
+        </div>
+        <p class="text-slate-900 font-bold mt-4"></p>
+      </div>
+      <button class="mt-4 w-full bg-gradient-to-r from-sky-700 to-sky-500 text-white py-2 rounded">Ver detalles</button>
+    </div>
+  </template>
+
+  <!-- JavaScript -->
+  <script src="productos.js" defer></script>
+  <script src="https://kit.fontawesome.com/6e515eb09f.js" crossorigin="anonymous"></script>
+</body>
+<!-- Llamado a la Acción -->
+<section class="from-slate-950 to-sky-500 px-4 py-8 bg-gradient-to-r bg-slate-50 ">
+  <div class="container mx-auto px-6 py-16 text-center text-white">
+    <h2 class="text-3xl font-bold mb-4">¿Listo para Comenzar?</h2>
+    <p class="mb-8">Únete a nosotros y lleva tu negocio al siguiente nivel.</p>
+    <!-- Botón para abrir el formulario -->
+    <button id="toggle-form-btn" class="bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-800 transition duration-300">
+      Regístrate Ahora
+    </button>
+
+    <!-- Formulario -->
+    <div id="formulario" class="mt-8 bg-gray-100 p-6 rounded-lg shadow-lg max-w-md mx-auto hidden opacity-0 transition-all duration-300 transform scale-95">
+      <h2 class="text-2xl font-bold text-gray-800 mb-4">Formulario de Registro</h2>
+
+      <!-- Campo Nombre -->
+      <label for="nombre" class="block text-gray-700 font-semibold mb-2">Nombre</label>
+      <input type="text" id="nombre" name="nombre" class="text-black w-full px-4 py-2 mb-4 border rounded-lg"
+        placeholder="Tu nombre" required>
+
+      <!-- Campo Apellido -->
+      <label for="apellido" class="block text-gray-700 font-semibold mb-2">Apellido</label>
+      <input type="text" id="apellido" name="apellido" class="text-black w-full px-4 py-2 mb-4 border rounded-lg"
+        placeholder="Tu apellido" required>
+
+      <!-- Campo Correo -->
+      <label for="correo" class="block text-gray-700 font-semibold mb-2">Correo Electrónico</label>
+      <input type="email" id="correo" name="correo" class="text-black w-full px-4 py-2 mb-4 border rounded-lg"
+        placeholder="Tu correo electrónico" required>
+
+      <!-- Campo Descripción -->
+      <label for="descripcion" class="block text-gray-700 font-semibold mb-2">Descripción</label>
+      <textarea id="descripcion" name="descripcion" rows="4" class="text-black w-full px-4 py-2 mb-4 border rounded-lg"
+        placeholder="Escribe brevemente lo que necesitas"></textarea>
+
+      <!-- Botón Enviar -->
+      <button id="submit-btn" class="bg-sky-600 text-white px-6 py-3 rounded-lg hover:bg-sky-800 transition duration-300">
+        Enviar
+      </button>
+    </div>
+
+    <!-- Mensaje de confirmación -->
+    <div id="mensaje" class="mt-8 hidden text-center text-white font-bold text-xl">
+      ¡Gracias por registrarte! Nos pondremos en contacto contigo pronto.
+    </div>
+  </div>
+</section>
+
+<!-- Pie de Página -->
+<footer class="bg-stone-950">
+  <div class="container mx-auto px-6 py-8 text-gray-400">
+    <div class="flex flex-col md:flex-row justify-between">
+      <p>&copy; 2024 MiEmpresa. Todos los derechos reservados.</p>
+      <div class="space-x-4">
+        <a href="#" class="hover:text-white">Privacidad</a>
+        <a href="#" class="hover:text-white">Términos</a>
+        <a href="#" class="hover:text-white">Contacto</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Mostrar/Ocultar el formulario con animaciones
+  const toggleFormBtn = document.getElementById('toggle-form-btn');
+  const formulario = document.getElementById('formulario');
+  const mensaje = document.getElementById('mensaje');
+
+  toggleFormBtn.addEventListener('click', () => {
+    if (formulario.classList.contains('hidden')) {
+      formulario.classList.remove('hidden', 'opacity-0', 'scale-95');
+      formulario.classList.add('opacity-100', 'scale-100');
+    } else {
+      formulario.classList.add('opacity-0', 'scale-95');
+      setTimeout(() => formulario.classList.add('hidden'), 300); // Esperar a que termine la animación
+    }
+  });
+
+  // Validar y enviar el formulario
+  document.getElementById('submit-btn').addEventListener('click', (e) => {
+    e.preventDefault(); // Evitar recarga de la página
+    const nombre = document.getElementById('nombre').value.trim();
+    const apellido = document.getElementById('apellido').value.trim();
+    const correo = document.getElementById('correo').value.trim();
+    const descripcion = document.getElementById('descripcion').value.trim();
+
+    if (!nombre || !apellido || !correo) {
+      alert('Por favor, completa todos los campos obligatorios.');
+      return;
+    }
+
+    formulario.classList.add('hidden');
+    mensaje.classList.remove('hidden');
+    mensaje.textContent = '¡Gracias, ' + nombre + '! Nos pondremos en contacto contigo pronto.';
+  });
+</script>
+
+</html>
